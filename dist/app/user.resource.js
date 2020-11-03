@@ -9,13 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserView = exports.UserModel = exports.UserController = exports.UserResource = void 0;
+exports.UserController = exports.UserView = exports.UserModel = exports.UserResource = void 0;
 const resource_1 = require("../lib/resource");
 class UserResource extends resource_1.Resource {
-    constructor(db) {
-        super('users', 'user');
-        this.db = db;
-    }
+    constructor(app) { super(app, 'user', 'users', 'user'); }
     initRoutes() {
         this.router.get(`/${this.itemPath}/me`, (req, res) => {
             this.createController(req).getMe()
@@ -30,27 +27,14 @@ class UserResource extends resource_1.Resource {
         return new UserController(model, view, req.user);
     }
     createModel() {
-        return new UserModel(this.db);
+        return new UserModel(this);
     }
     createView(model) {
         return new UserView(model);
     }
 }
 exports.UserResource = UserResource;
-class UserController extends resource_1.Controller {
-    constructor(model, view, user) {
-        super(model, view);
-        this.user = user;
-    }
-    getMe() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.view.build(this.user);
-        });
-    }
-}
-exports.UserController = UserController;
 class UserModel extends resource_1.Model {
-    get name() { return 'user'; }
     get schema() { return ['id', 'username', 'password']; }
     findByUsername(username) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -63,13 +47,22 @@ class UserModel extends resource_1.Model {
 }
 exports.UserModel = UserModel;
 class UserView extends resource_1.View {
-    constructor(model) {
-        super(model, 'users', 'user');
-    }
     getData(user, context) {
         return { id: user.id, username: user.username };
     }
 }
 exports.UserView = UserView;
-exports.default = (db) => new UserResource(db);
+class UserController extends resource_1.Controller {
+    constructor(model, view, user) {
+        super(model, view);
+        this.user = user;
+    }
+    getMe() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.view.build(this.user);
+        });
+    }
+}
+exports.UserController = UserController;
+exports.default = (app) => new UserResource(app);
 //# sourceMappingURL=user.resource.js.map

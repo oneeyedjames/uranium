@@ -3,19 +3,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HostModel = exports.HostResource = void 0;
 const resource_1 = require("../lib/resource");
 class HostResource extends resource_1.Resource {
-    constructor(db) {
-        super('hosts', 'host');
-        this.db = db;
-    }
+    constructor(app) { super(app, 'host', 'hosts', 'host'); }
     createModel() {
-        return new HostModel(this.db);
+        return new HostModel(this);
     }
 }
 exports.HostResource = HostResource;
 class HostModel extends resource_1.Model {
-    get name() { return 'host'; }
     get schema() { return ['id', 'title', 'summary']; }
 }
 exports.HostModel = HostModel;
-exports.default = (db) => new HostResource(db);
+exports.default = (app) => new HostResource(app);
 //# sourceMappingURL=host.resource.js.map

@@ -14,12 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const user_resource_1 = require("./user.resource");
-exports.default = (db) => {
+exports.default = (app) => {
     return (token) => __awaiter(void 0, void 0, void 0, function* () {
         let raw = Buffer.from(token, 'base64').toString('utf8');
         let username = '', password = '';
         [username, password] = raw.split(':', 2);
-        let model = new user_resource_1.UserModel(db);
+        let res = new user_resource_1.UserResource(app);
+        let model = new user_resource_1.UserModel(res);
         let user;
         if (user = yield model.findByUsername(username)) {
             if (yield bcrypt_1.default.compare(password, user.password)) {

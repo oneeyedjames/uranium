@@ -8,19 +8,18 @@ import HostResource from './host.resource';
 import UserResource from './user.resource';
 import RoleResource from './role.resource';
 
-export default (db: Database) => {
-	let app = new Application(db)
-	.authenticate('Basic', basicAuth(db))
-	.authenticate('JWT', jwtAuth(db))
-	.route('/api', HostResource(db).router)
-	.route('/api', UserResource(db).router)
-	.route('/api', RoleResource(db).router);
+export class RestApplication extends Application {
+	constructor(db: Database) {
+		super(db);
 
-	['blog'].forEach((modName: string) => {
-		import(`../mod/${modName}/module`).then((mod) => {
-			app.route(`/api`, mod.default(db).router);
-		});
-	});
+		this.authenticate('JWT', jwtAuth(this))
+		.authenticate('Basic', basicAuth(this))
+		.route('/api', HostResource(this).router)
+		.route('/api', UserResource(this).router)
+		.route('/api', RoleResource(this).router);
 
-	return app;
+		['blog'].forEach(this.load.bind(this));
+	}
 }
+
+export default (db: Database) => new RestApplication(db);

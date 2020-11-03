@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
-import { Database, Entity } from '../lib/database';
-import { Resource, Controller, Model, View, ViewContext } from '../lib/resource';
+import { Application } from '../lib/application';
+import { Resource, Entity, Controller, Model, View, ViewContext } from '../lib/resource';
 import { UserIdentity } from '../lib/authenticator';
 
 export interface UserEntity extends Entity, UserIdentity {
@@ -9,7 +9,7 @@ export interface UserEntity extends Entity, UserIdentity {
 }
 
 export class UserResource extends Resource<UserEntity> {
-	constructor(private db: Database) { super('users', 'user'); }
+	constructor(app: Application) { super(app, 'user', 'users', 'user'); }
 
 	protected initRoutes() {
 		this.router.get(`/${this.itemPath}/me`, (req: Request, res: Response) => {
@@ -29,11 +29,28 @@ export class UserResource extends Resource<UserEntity> {
 	}
 
 	protected createModel() {
-		return new UserModel(this.db);
+		return new UserModel(this);
 	}
 
 	protected createView(model: Model<UserEntity>) {
 		return new UserView(model);
+	}
+}
+
+export class UserModel extends Model<UserEntity> {
+	get schema() { return ['id', 'username', 'password']; }
+
+	async findByUsername(username: string): Promise<UserEntity> {
+		let result = await this.search({ username: username });
+		if (result.length) return result[0];
+
+		return null;
+	}
+}
+
+export class UserView extends View<UserEntity> {
+	protected getData(user: UserEntity, context: ViewContext) {
+		return { id: user.id, username: user.username };
 	}
 }
 
@@ -51,26 +68,4 @@ export class UserController extends Controller<UserEntity> {
 	}
 }
 
-export class UserModel extends Model<UserEntity> {
-	get name() { return 'user'; }
-	get schema() { return ['id', 'username', 'password']; }
-
-	async findByUsername(username: string): Promise<UserEntity> {
-		let result = await this.search({ username: username });
-		if (result.length) return result[0];
-
-		return null;
-	}
-}
-
-export class UserView extends View<UserEntity> {
-	constructor(model: Model<UserEntity>) {
-		super(model, 'users', 'user');
-	}
-
-	protected getData(user: UserEntity, context: ViewContext) {
-		return { id: user.id, username: user.username };
-	}
-}
-
-export default (db: Database) => new UserResource(db);
+export default (app: Application) => new UserResource(app);

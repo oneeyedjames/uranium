@@ -1,17 +1,18 @@
 import bcrypt from 'bcrypt';
 
-import { Database } from '../lib/database';
+import { Application } from '../lib/application';
 
-import { UserEntity, UserModel } from './user.resource';
+import { UserResource, UserEntity, UserModel } from './user.resource';
 
-export default (db: Database) => {
+export default (app: Application) => {
 	return async (token: string) => {
 		let raw = Buffer.from(token, 'base64').toString('utf8');
 
 		let username = '', password = '';
 		[username, password] = raw.split(':', 2);
 
-		let model = new UserModel(db);
+		let res = new UserResource(app);
+		let model = new UserModel(res);
 
 		let user: UserEntity;
 		if (user = await model.findByUsername(username)) {

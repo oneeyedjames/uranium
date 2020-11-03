@@ -1,14 +1,15 @@
 import jwt from 'jsonwebtoken';
 
-import { Database } from '../lib/database';
+import { Application } from '../lib/application';
 
-import { UserEntity, UserModel } from './user.resource';
+import { UserResource, UserEntity, UserModel } from './user.resource';
 
-export default (db: Database) => {
+export default (app: Application) => {
 	return async (token: string): Promise<UserEntity> => {
 		let payload = jwt.decode(token);
 
-		let model = new UserModel(db);
+		let res = new UserResource(app);
+		let model = new UserModel(res);
 
 		let user: UserEntity;
 		if (user = await model.find(payload['usr'])) {

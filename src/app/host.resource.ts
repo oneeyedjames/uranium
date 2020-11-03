@@ -1,5 +1,5 @@
-import { Database, Entity } from '../lib/database';
-import { Resource, Model } from '../lib/resource';
+import { Application } from '../lib/application';
+import { Resource, Entity, Model } from '../lib/resource';
 
 export interface HostEntity extends Entity {
 	title: string;
@@ -7,16 +7,15 @@ export interface HostEntity extends Entity {
 }
 
 export class HostResource extends Resource<HostEntity> {
-	constructor(private db: Database) { super('hosts', 'host'); }
+	constructor(app: Application) { super(app, 'host', 'hosts', 'host'); }
 
 	protected createModel() {
-		return new HostModel(this.db);
+		return new HostModel(this);
 	}
 }
 
 export class HostModel extends Model<HostEntity> {
-	get name() { return 'host'; }
 	get schema() { return ['id', 'title', 'summary']; }
 }
 
-export default (db: Database) => new HostResource(db);
+export default (app: Application) => new HostResource(app);

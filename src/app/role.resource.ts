@@ -1,7 +1,5 @@
-import { Request } from 'express';
-
-import { Database, Entity } from '../lib/database';
-import { Resource, Model } from '../lib/resource';
+import { Application } from '../lib/application';
+import { Resource, Entity, Model } from '../lib/resource';
 
 export interface RoleEntity extends Entity {
 	title: string;
@@ -9,16 +7,15 @@ export interface RoleEntity extends Entity {
 }
 
 export class RoleResource extends Resource<RoleEntity> {
-	constructor(private db: Database) { super('roles', 'role'); }
+	constructor(app: Application) { super(app, 'role', 'roles', 'role'); }
 
 	protected createModel() {
-		return new RoleModel(this.db);
+		return new RoleModel(this);
 	}
 }
 
 export class RoleModel extends Model<RoleEntity> {
-	get name() { return 'role'; }
 	get schema() { return ['id', 'title', 'summary']; }
 }
 
-export default (db: Database) => new RoleResource(db);
+export default (app: Application) => new RoleResource(app);

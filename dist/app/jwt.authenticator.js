@@ -14,10 +14,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const user_resource_1 = require("./user.resource");
-exports.default = (db) => {
+exports.default = (app) => {
     return (token) => __awaiter(void 0, void 0, void 0, function* () {
         let payload = jsonwebtoken_1.default.decode(token);
-        let model = new user_resource_1.UserModel(db);
+        let res = new user_resource_1.UserResource(app);
+        let model = new user_resource_1.UserModel(res);
         let user;
         if (user = yield model.find(payload['usr'])) {
             jsonwebtoken_1.default.verify(token, user.password, (err) => {
