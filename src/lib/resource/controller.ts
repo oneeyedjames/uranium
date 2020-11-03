@@ -1,7 +1,5 @@
 import { HttpError } from '../http';
-import { Entity } from '../database';
-import { Model } from './model';
-import { View } from './view';
+import { Entity, Model, View } from '../resource';
 
 export class Controller<E extends Entity> {
 	get model() { return this._model; }
@@ -9,7 +7,7 @@ export class Controller<E extends Entity> {
 
 	constructor(private _model: Model<E>, private _view: View<E>) {}
 
-	async getAll(): Promise<object[]> {
+	async getAll(): Promise<object> {
 		if (!this.canRead()) throw new HttpError(401);
 
 		let result = await this.model.search({});
@@ -60,7 +58,7 @@ export class Controller<E extends Entity> {
 	protected parse(data: any, entity?: E): E {
 		entity = entity || { id: null } as E;
 
-		this.model.schema.forEach((field) => {
+		this.model.schema.forEach((field: string) => {
 			if (data[field]) entity[field] = data[field];
 		});
 

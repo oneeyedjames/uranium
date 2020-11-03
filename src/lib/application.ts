@@ -6,6 +6,8 @@ import bodyParser from 'body-parser';
 import { Authenticator, AuthFunction } from './authenticator';
 import { Database } from './database';
 
+export { Module } from './module';
+
 export class Application {
 	protected application: express.Application;
 	protected server: Server;
@@ -14,7 +16,9 @@ export class Application {
 
 	private corsHosts: string[] = [];
 
-	constructor(protected database: Database) {
+	get database() { return this._database; }
+
+	constructor(private _database: Database) {
 		this.application = express()
 		.use(bodyParser.json())
 		.use(bodyParser.urlencoded({ extended: false }))
@@ -38,6 +42,12 @@ export class Application {
 	public route(path: string, handler: express.Handler|express.Router): Application {
 		this.application.use(path, handler);
 		return this;
+	}
+
+	public load(modName: string) {
+		import(`../mod/${modName}/module`).then((mod) => {
+			this.route(`/api`, mod.default(this).router);
+		});
 	}
 
 	public listen(port: number|string, host: string): Promise<any> {

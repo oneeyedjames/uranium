@@ -1,22 +1,25 @@
 import { HttpError } from '../http';
-import { Entity } from '../database';
-import { Model } from './model';
+import { Entity, Model } from '../resource';
 
 export type ViewContext = 'list' | 'item';
 
 export class View<E extends Entity> {
 	get model() { return this._model; }
+	get resource() { return this.model.resource; }
 
-	get urlPath(): string {
-		return '/api' + (this.modulePath ? `/${this.modulePath}` : '');
+	get urlPath() {
+		let path = '/api';
+
+		if (this.resource.module)
+			path += `/${this.resource.module.path}`;
+
+		return path;
 	}
 
-	constructor(
-		private _model: Model<E>,
-		protected basePath: string,
-		protected itemPath?: string,
-		protected modulePath?: string
-	) {}
+	get basePath() { return this.resource.basePath; }
+	get itemPath() { return this.resource.itemPath; }
+
+	constructor(private _model: Model<E>) {}
 
 	build(entity: E): object;
 	build(entity: E[]): object;
@@ -25,12 +28,14 @@ export class View<E extends Entity> {
 			let data = {
 				count: entity.length,
 				_links: {
-					self: `${this.urlPath}/${this.basePath}`
+					self: {
+						href: `${this.urlPath}/${this.basePath}`
+					}
 				},
-				_embeds: {}
-			}
+				_embedded: {}
+			};
 
-			data._embeds[this.basePath] = entity.map((item) => {
+			data._embedded[this.basePath] = entity.map((item) => {
 				return this.sanitize(item, 'list');
 			});
 
@@ -56,8 +61,8 @@ export class View<E extends Entity> {
 	protected getData(entity: E, context: ViewContext): object {
 		let data = {};
 
-		this.model.schema.forEach((path: string) => {
-			data[path] = entity[path];
+		this.model.schema.forEach((field: string) => {
+			data[field] = entity[field];
 		});
 
 		return data;

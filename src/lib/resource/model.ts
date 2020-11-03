@@ -1,25 +1,28 @@
-import { Database, Entity } from '../database';
+import { Resource, Entity } from '../resource';
 
 export abstract class Model<E extends Entity> {
-	abstract get name(): string;
+	get name() { return this.resource.name; }
 	abstract get schema(): string[];
 
-	constructor(private db: Database) {}
+	get resource() { return this._resource; }
+	get database() { return this.resource.application.database; }
+
+	constructor(private _resource: Resource<E>) {}
 
 	search(args: object): Promise<E[]> {
-		return this.db.search<E>(this.name, args);
+		return this.database.search<E>(this.name, args);
 	}
 
 	find(id: any): Promise<E> {
-		return this.db.find<E>(this.name, id);
+		return this.database.find<E>(this.name, id);
 	}
 
 	save(entity: E): Promise<E> {
-		return this.db.save<E>(this.name, entity);
+		return this.database.save<E>(this.name, entity);
 	}
 
 	delete(id: any): Promise<void> {
-		return this.db.delete(this.name, id);
+		return this.database.delete(this.name, id);
 	}
 
 	protected beforeSave(entity: E) { return entity; }

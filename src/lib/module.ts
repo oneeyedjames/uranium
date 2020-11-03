@@ -1,11 +1,15 @@
 import { Router } from 'express';
 
-import { Resource } from './resource';
-import { Entity } from './database';
+import { Application } from './application';
+import { Resource, Entity } from './resource';
 
 export abstract class Module {
 	private _router: Router;
 
+	get name() { return this._name; }
+	get path() { return this._path || this.name; }
+
+	get application() { return this._application; }
 	abstract get resources(): Resource<Entity>[];
 
 	get router(): Router {
@@ -19,5 +23,9 @@ export abstract class Module {
 		return this._router;
 	}
 
-	constructor(private path: string) {}
+	constructor(
+		private _application: Application,
+		private _name: string,
+		private _path?: string
+	) {}
 }
