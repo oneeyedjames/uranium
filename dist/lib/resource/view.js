@@ -3,26 +3,31 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.View = void 0;
 const http_1 = require("../http");
 class View {
-    constructor(_model, basePath, itemPath, modulePath) {
+    constructor(_model) {
         this._model = _model;
-        this.basePath = basePath;
-        this.itemPath = itemPath;
-        this.modulePath = modulePath;
     }
     get model() { return this._model; }
+    get resource() { return this.model.resource; }
     get urlPath() {
-        return '/api' + (this.modulePath ? `/${this.modulePath}` : '');
+        let path = '/api';
+        if (this.resource.module)
+            path += `/${this.resource.module.path}`;
+        return path;
     }
+    get basePath() { return this.resource.basePath; }
+    get itemPath() { return this.resource.itemPath; }
     build(entity) {
         if (entity instanceof Array) {
             let data = {
                 count: entity.length,
                 _links: {
-                    self: `${this.urlPath}/${this.basePath}`
+                    self: {
+                        href: `${this.urlPath}/${this.basePath}`
+                    }
                 },
-                _embeds: {}
+                _embedded: {}
             };
-            data._embeds[this.basePath] = entity.map((item) => {
+            data._embedded[this.basePath] = entity.map((item) => {
                 return this.sanitize(item, 'list');
             });
             return data;
@@ -43,8 +48,8 @@ class View {
     }
     getData(entity, context) {
         let data = {};
-        this.model.schema.forEach((path) => {
-            data[path] = entity[path];
+        this.model.schema.forEach((field) => {
+            data[field] = entity[field];
         });
         return data;
     }

@@ -2,20 +2,23 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Model = void 0;
 class Model {
-    constructor(db) {
-        this.db = db;
+    constructor(_resource) {
+        this._resource = _resource;
     }
+    get name() { return this.resource.name; }
+    get resource() { return this._resource; }
+    get database() { return this.resource.application.database; }
     search(args) {
-        return this.db.search(this.name, args);
+        return this.database.search(this.name, args);
     }
     find(id) {
-        return this.db.find(this.name, id);
+        return this.database.find(this.name, id);
     }
     save(entity) {
-        return this.db.save(this.name, entity);
+        return this.database.save(this.name, entity);
     }
     delete(id) {
-        return this.db.delete(this.name, id);
+        return this.database.delete(this.name, id);
     }
     beforeSave(entity) { return entity; }
     afterSave(entity) { return entity; }

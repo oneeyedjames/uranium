@@ -1,15 +1,36 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Application = void 0;
+exports.Application = exports.Module = void 0;
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const authenticator_1 = require("./authenticator");
+var module_1 = require("./module");
+Object.defineProperty(exports, "Module", { enumerable: true, get: function () { return module_1.Module; } });
 class Application {
-    constructor(database) {
-        this.database = database;
+    constructor(_database) {
+        this._database = _database;
         this.authenticator = new authenticator_1.Authenticator();
         this.corsHosts = [];
         this.application = express_1.default()
@@ -19,6 +40,7 @@ class Application {
             .use(this.enableCors(this.corsHosts))
             .use(this.authenticator.authenticate.bind(this.authenticator));
     }
+    get database() { return this._database; }
     allowCors(host) {
         if (typeof host == 'string')
             this.corsHosts.push(host);
@@ -33,6 +55,11 @@ class Application {
     route(path, handler) {
         this.application.use(path, handler);
         return this;
+    }
+    load(modName) {
+        Promise.resolve().then(() => __importStar(require(`../mod/${modName}/module`))).then((mod) => {
+            this.route(`/api`, mod.default(this).router);
+        });
     }
     listen(port, host) {
         port = this.normalizePort(port);
