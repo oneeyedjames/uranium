@@ -1,19 +1,18 @@
-import { Database, Entity } from '../../lib/database';
-import { Resource } from '../../lib/resource';
-import { Module } from '../../lib/module';
+import { Application, Module } from '../../lib/application';
+import { Resource, Entity } from '../../lib/resource';
 
 import PostResource from './post.resource';
 
 export class BlogModule extends Module {
-	private _resources: Resource<Entity>[] = [];
+	private _resources: Resource<Entity>[];
 
 	get resources() { return this._resources; }
 
-	constructor(db: Database) {
-		super('blog');
+	constructor(app: Application) {
+		super(app, 'blog');
 
-		this._resources.push(PostResource(db));
+		this._resources = [PostResource(this)];
 	}
 }
 
-export default (db: Database) => new BlogModule(db);
+export default (app: Application) => new BlogModule(app);

@@ -1,5 +1,6 @@
-import { Database, Entity } from '../../lib/database';
-import { Resource, Controller, Model, View, ViewContext } from '../../lib/resource';
+import { Resource, Entity, Model, View, ViewContext } from '../../lib/resource';
+
+import { BlogModule } from './module';
 
 export interface PostEntity extends Entity {
 	title: string;
@@ -8,10 +9,10 @@ export interface PostEntity extends Entity {
 }
 
 export class PostResource extends Resource<PostEntity> {
-	constructor(private db: Database) { super('posts', 'post', 'blog'); }
+	constructor(mod: BlogModule) { super(mod, 'post', 'posts', 'post'); }
 
 	protected createModel() {
-		return new PostModel(this.db);
+		return new PostModel(this);
 	}
 
 	protected createView(model: Model<PostEntity>) {
@@ -20,15 +21,10 @@ export class PostResource extends Resource<PostEntity> {
 }
 
 export class PostModel extends Model<PostEntity> {
-	get name() { return 'blog_post'; }
 	get schema() { return ['id', 'title', 'summary', 'content']; }
 }
 
 export class PostView extends View<PostEntity> {
-	constructor(model: Model<PostEntity>) {
-		super(model, 'posts', 'post', 'blog');
-	}
-
 	protected getData(post: PostEntity, context: ViewContext) {
 		let data = {
 			id: post.id,
@@ -44,4 +40,4 @@ export class PostView extends View<PostEntity> {
 	}
 }
 
-export default (db: Database) => new PostResource(db);
+export default (mod: BlogModule) => new PostResource(mod);
