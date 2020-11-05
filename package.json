@@ -15,6 +15,7 @@
 	"dependencies": {
 		"bcrypt": "^5.0.0",
 		"body-parser": "^1.19.0",
+		"cookie-parser": "^1.4.5",
 		"express": "^4.17.1",
 		"jsonwebtoken": "^8.5.1",
 		"method-override": "^3.0.0",
@@ -22,8 +23,11 @@
 	},
 	"devDependencies": {
 		"@types/bcrypt": "^3.0.0",
+		"@types/body-parser": "^1.19.0",
+		"@types/cookie-parser": "^1.4.2",
 		"@types/express": "^4.17.8",
 		"@types/jsonwebtoken": "^8.5.0",
+		"@types/method-override": "0.0.31",
 		"@types/sqlite3": "^3.1.6",
 		"concurrently": "^5.3.0",
 		"dotenv": "^8.2.0",

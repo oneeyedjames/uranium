@@ -18,6 +18,7 @@ class RestApplication extends application_1.Application {
             .route('/api', host_resource_1.default(this).router)
             .route('/api', user_resource_1.default(this).router)
             .route('/api', role_resource_1.default(this).router);
+        this.authenticator.acceptCookies('auth');
         ['blog'].forEach(this.load.bind(this));
     }
 }

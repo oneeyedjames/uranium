@@ -18,6 +18,8 @@ export class RestApplication extends Application {
 		.route('/api', UserResource(this).router)
 		.route('/api', RoleResource(this).router);
 
+		this.authenticator.acceptCookies('auth');
+
 		['blog'].forEach(this.load.bind(this));
 	}
 }

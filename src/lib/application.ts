@@ -2,9 +2,11 @@ import { Server } from 'http';
 
 import express from 'express';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 
-import { Authenticator, AuthFunction } from './authenticator';
 import { Database } from './database';
+import { Authenticator, AuthFunction } from './authenticator';
+export { Authenticator, AuthFunction } from './authenticator';
 
 export { Module } from './module';
 
@@ -22,7 +24,7 @@ export class Application {
 		this.application = express()
 		.use(bodyParser.json())
 		.use(bodyParser.urlencoded({ extended: false }))
-		// .use(cookieParser())
+		.use(cookieParser())
 		.use(this.enableCors(this.corsHosts))
 		.use(this.authenticator.authenticate.bind(this.authenticator));
 	}

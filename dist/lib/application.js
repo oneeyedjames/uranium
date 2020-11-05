@@ -22,10 +22,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Application = exports.Module = void 0;
+exports.Application = exports.Module = exports.Authenticator = void 0;
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const authenticator_1 = require("./authenticator");
+var authenticator_2 = require("./authenticator");
+Object.defineProperty(exports, "Authenticator", { enumerable: true, get: function () { return authenticator_2.Authenticator; } });
 var module_1 = require("./module");
 Object.defineProperty(exports, "Module", { enumerable: true, get: function () { return module_1.Module; } });
 class Application {
@@ -36,7 +39,7 @@ class Application {
         this.application = express_1.default()
             .use(body_parser_1.default.json())
             .use(body_parser_1.default.urlencoded({ extended: false }))
-            // .use(cookieParser())
+            .use(cookie_parser_1.default())
             .use(this.enableCors(this.corsHosts))
             .use(this.authenticator.authenticate.bind(this.authenticator));
     }
