@@ -1,11 +1,13 @@
 import { readdir } from 'fs';
 import { join } from 'path';
 
+import { Router, Request, Response } from 'express';
+
 import { Application } from '../lib/application';
 import { Database } from '../lib/database';
 
-import basicAuth from './basic.authenticator';
-import jwtAuth from './jwt.authenticator';
+import createBasicAuth from './basic.authenticator';
+import createJwtAuth from './jwt.authenticator';
 
 import HostResource from './host.resource';
 import UserResource from './user.resource';
@@ -15,11 +17,27 @@ export class RestApplication extends Application {
 	constructor(db: Database) {
 		super(db);
 
-		this.authenticate('JWT', jwtAuth(this))
-		.authenticate('Basic', basicAuth(this))
+		let basicAuth = createBasicAuth(this);
+		let jwtAuth = createJwtAuth(this);
+
+		this.authenticate('JWT', jwtAuth.authenticate)
+		.authenticate('Basic', basicAuth.authenticate)
 		.route('/api', HostResource(this).router)
 		.route('/api', UserResource(this).router)
 		.route('/api', RoleResource(this).router);
+
+		this.route('/api', Router()
+		.post('/login', (req: Request, res: Response) => {
+			basicAuth.login(req.body.username, req.body.password)
+			.then((user) => jwtAuth.generate(user))
+			.then((token: string) => res.json({ token: token }))
+			.catch((err) => res.status(401).json({
+				error: {
+					name: err.name || 'Error',
+					message: err.message || err
+				}
+			}));
+		}));
 
 		this.authenticator.acceptCookies('auth');
 

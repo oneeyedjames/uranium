@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RestApplication = void 0;
 const fs_1 = require("fs");
 const path_1 = require("path");
+const express_1 = require("express");
 const application_1 = require("../lib/application");
 const basic_authenticator_1 = __importDefault(require("./basic.authenticator"));
 const jwt_authenticator_1 = __importDefault(require("./jwt.authenticator"));
@@ -15,11 +16,25 @@ const role_resource_1 = __importDefault(require("./role.resource"));
 class RestApplication extends application_1.Application {
     constructor(db) {
         super(db);
-        this.authenticate('JWT', jwt_authenticator_1.default(this))
-            .authenticate('Basic', basic_authenticator_1.default(this))
+        let basicAuth = basic_authenticator_1.default(this);
+        let jwtAuth = jwt_authenticator_1.default(this);
+        this.authenticate('JWT', jwtAuth.authenticate)
+            .authenticate('Basic', basicAuth.authenticate)
             .route('/api', host_resource_1.default(this).router)
             .route('/api', user_resource_1.default(this).router)
             .route('/api', role_resource_1.default(this).router);
+        this.route('/api', express_1.Router()
+            .post('/login', (req, res) => {
+            basicAuth.login(req.body.username, req.body.password)
+                .then((user) => jwtAuth.generate(user))
+                .then((token) => res.json({ token: token }))
+                .catch((err) => res.status(401).json({
+                error: {
+                    name: err.name || 'Error',
+                    message: err.message || err
+                }
+            }));
+        }));
         this.authenticator.acceptCookies('auth');
         let path = path_1.join(__dirname, '../mod');
         fs_1.readdir(path, { withFileTypes: true }, (err, files) => {

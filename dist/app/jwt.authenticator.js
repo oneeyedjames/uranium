@@ -12,24 +12,40 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.JWTAuthenticator = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const user_resource_1 = require("./user.resource");
-exports.default = (app) => {
-    return (token) => __awaiter(void 0, void 0, void 0, function* () {
-        let payload = jsonwebtoken_1.default.decode(token);
-        let res = new user_resource_1.UserResource(app);
-        let model = new user_resource_1.UserModel(res);
-        let user;
-        if (user = yield model.find(payload['usr'])) {
-            jsonwebtoken_1.default.verify(token, user.password, (err) => {
-                if (err)
-                    throw new Error('Invalid Password');
-            });
-            return user;
-        }
-        else {
-            throw new Error('Invalid Username');
-        }
-    });
-};
+class JWTAuthenticator {
+    constructor(app) {
+        this.app = app;
+        this.authenticate = (token) => __awaiter(this, void 0, void 0, function* () {
+            return this.validate(token);
+        });
+    }
+    validate(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let res = new user_resource_1.UserResource(this.app);
+            let model = new user_resource_1.UserModel(res);
+            let payload = jsonwebtoken_1.default.decode(token);
+            let user;
+            if (user = yield model.findByUsername(payload['usr'])) {
+                jsonwebtoken_1.default.verify(token, user.password, (err) => {
+                    if (err)
+                        throw new Error('Invalid Password');
+                });
+                return user;
+            }
+            else {
+                throw new Error('Invalid Username');
+            }
+        });
+    }
+    generate(user) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield jsonwebtoken_1.default.sign({ usr: user.username }, user.password);
+        });
+    }
+}
+exports.JWTAuthenticator = JWTAuthenticator;
+exports.default = (app) => new JWTAuthenticator(app);
 //# sourceMappingURL=jwt.authenticator.js.map
