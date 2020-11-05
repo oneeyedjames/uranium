@@ -59,8 +59,8 @@ class Application {
         this.application.use(path, handler);
         return this;
     }
-    load(modName) {
-        Promise.resolve().then(() => __importStar(require(`../mod/${modName}/module`))).then((mod) => {
+    load(path) {
+        Promise.resolve().then(() => __importStar(require(`${path}/module`))).then((mod) => {
             this.route(`/api`, mod.default(this).router);
         });
     }

@@ -1,3 +1,6 @@
+import { readdir } from 'fs';
+import { join } from 'path';
+
 import { Application } from '../lib/application';
 import { Database } from '../lib/database';
 
@@ -20,7 +23,17 @@ export class RestApplication extends Application {
 
 		this.authenticator.acceptCookies('auth');
 
-		['blog'].forEach(this.load.bind(this));
+		let path = join(__dirname, '../mod');
+
+		readdir(path, { withFileTypes: true }, (err, files) => {
+			if (err) return console.log(err);
+
+			for (let file of files) {
+				if (file.isDirectory()) {
+					this.load(join(path, file.name));
+				}
+			}
+		});
 	}
 }
 

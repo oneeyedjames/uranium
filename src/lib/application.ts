@@ -46,8 +46,8 @@ export class Application {
 		return this;
 	}
 
-	public load(modName: string) {
-		import(`../mod/${modName}/module`).then((mod) => {
+	public load(path: string) {
+		import(`${path}/module`).then((mod) => {
 			this.route(`/api`, mod.default(this).router);
 		});
 	}
