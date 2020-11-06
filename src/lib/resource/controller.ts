@@ -1,11 +1,17 @@
 import { HttpError } from '../http';
 import { Entity, Model, View } from '../resource';
+import { UserIdentity } from '../authenticator';
 
 export class Controller<E extends Entity> {
 	get model() { return this._model; }
 	get view() { return this._view; }
+	get user() { return this._user; }
 
-	constructor(private _model: Model<E>, private _view: View<E>) {}
+	constructor(
+		private _model: Model<E>,
+		private _view: View<E>,
+		private _user: UserIdentity
+	) {}
 
 	async getAll(): Promise<object> {
 		if (!this.canRead()) throw new HttpError(401);

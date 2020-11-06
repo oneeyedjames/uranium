@@ -92,7 +92,7 @@ export abstract class Resource<E extends Entity> {
 	protected createController(req: Request) {
 		let model = this.createModel();
 		let view = this.createView(model);
-		return new Controller<E>(model, view);
+		return new Controller<E>(model, view, req.user);
 	}
 
 	protected createErrorHandler(res: Response): (err: Error) => void {
