@@ -74,7 +74,7 @@ class Resource {
     createController(req) {
         let model = this.createModel();
         let view = this.createView(model);
-        return new controller_1.Controller(model, view);
+        return new controller_1.Controller(model, view, req.user);
     }
     createErrorHandler(res) {
         return (err) => {

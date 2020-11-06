@@ -12,12 +12,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Controller = void 0;
 const http_1 = require("../http");
 class Controller {
-    constructor(_model, _view) {
+    constructor(_model, _view, _user) {
         this._model = _model;
         this._view = _view;
+        this._user = _user;
     }
     get model() { return this._model; }
     get view() { return this._view; }
+    get user() { return this._user; }
     getAll() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.canRead())
