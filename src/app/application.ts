@@ -1,7 +1,7 @@
 import { readdir } from 'fs';
 import { join } from 'path';
 
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 
 import { Application } from '../lib/application';
 import { Database } from '../lib/database';
@@ -12,6 +12,14 @@ import createJwtAuth from './jwt.authenticator';
 import HostResource from './host.resource';
 import UserResource from './user.resource';
 import RoleResource from './role.resource';
+
+import { HostEntity, HostModel } from './host.resource';
+
+declare module 'express' {
+	interface Request {
+		instance?: HostEntity;
+	}
+}
 
 export class RestApplication extends Application {
 	constructor(db: Database) {
@@ -52,6 +60,23 @@ export class RestApplication extends Application {
 				}
 			}
 		});
+	}
+
+	protected init(
+		req: Request,
+		res: Response,
+		next: NextFunction
+	) {
+		let model = new HostModel(HostResource(this));
+		model.search({ domain: req.hostname })
+		.then((hosts: HostEntity[]) => {
+			return hosts.length ? hosts : model.search({ default: true });
+		})
+		.then((hosts: HostEntity[]) => {
+			if (hosts.length) req.instance = hosts[0];
+		})
+		.catch(console.log)
+		.finally(next);
 	}
 }
 

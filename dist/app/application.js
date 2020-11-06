@@ -13,6 +13,7 @@ const jwt_authenticator_1 = __importDefault(require("./jwt.authenticator"));
 const host_resource_1 = __importDefault(require("./host.resource"));
 const user_resource_1 = __importDefault(require("./user.resource"));
 const role_resource_1 = __importDefault(require("./role.resource"));
+const host_resource_2 = require("./host.resource");
 class RestApplication extends application_1.Application {
     constructor(db) {
         super(db);
@@ -46,6 +47,19 @@ class RestApplication extends application_1.Application {
                 }
             }
         });
+    }
+    init(req, res, next) {
+        let model = new host_resource_2.HostModel(host_resource_1.default(this));
+        model.search({ domain: req.hostname })
+            .then((hosts) => {
+            return hosts.length ? hosts : model.search({ default: true });
+        })
+            .then((hosts) => {
+            if (hosts.length)
+                req.instance = hosts[0];
+        })
+            .catch(console.log)
+            .finally(next);
     }
 }
 exports.RestApplication = RestApplication;

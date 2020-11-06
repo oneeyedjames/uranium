@@ -41,7 +41,8 @@ class Application {
             .use(body_parser_1.default.urlencoded({ extended: false }))
             .use(cookie_parser_1.default())
             .use(this.enableCors(this.corsHosts))
-            .use(this.authenticator.authenticate.bind(this.authenticator));
+            .use(this.authenticator.authenticate.bind(this.authenticator))
+            .use(this.init.bind(this));
     }
     get database() { return this._database; }
     allowCors(host) {
@@ -86,6 +87,9 @@ class Application {
         else {
             return Promise.reject(new Error('Server is already closed.'));
         }
+    }
+    init(req, res, next) {
+        next();
     }
     normalizePort(val) {
         let port = (typeof val === 'string') ? parseInt(val, 10) : val;

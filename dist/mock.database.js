@@ -74,6 +74,15 @@ exports.default = new MockDatabase({
             summary: 'Some things'
         },
     },
+    'host': {
+        1: {
+            id: 1,
+            title: 'Main Host',
+            summary: 'This is the main host.',
+            default: true,
+            domain: 'main.uranium.local'
+        }
+    },
     'blog_post': {
         1: {
             id: 1,

@@ -26,7 +26,8 @@ export class Application {
 		.use(bodyParser.urlencoded({ extended: false }))
 		.use(cookieParser())
 		.use(this.enableCors(this.corsHosts))
-		.use(this.authenticator.authenticate.bind(this.authenticator));
+		.use(this.authenticator.authenticate.bind(this.authenticator))
+		.use(this.init.bind(this));
 	}
 
 	public allowCors(host: string|string[]): Application {
@@ -75,6 +76,14 @@ export class Application {
 		} else {
 			return Promise.reject(new Error('Server is already closed.'));
 		}
+	}
+
+	protected init(
+		req: express.Request,
+		res: express.Response,
+		next: express.NextFunction
+	) {
+		next();
 	}
 
 	private normalizePort(val: number|string): number|string {

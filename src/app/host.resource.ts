@@ -4,6 +4,8 @@ import { Resource, Entity, Model } from '../lib/resource';
 export interface HostEntity extends Entity {
 	title: string;
 	summary: string;
+	default: boolean;
+	domain: string;
 }
 
 export class HostResource extends Resource<HostEntity> {
