@@ -53,10 +53,6 @@ class UserView extends resource_1.View {
 }
 exports.UserView = UserView;
 class UserController extends resource_1.Controller {
-    constructor(model, view, user) {
-        super(model, view);
-        this.user = user;
-    }
     getMe() {
         return __awaiter(this, void 0, void 0, function* () {
             return this.view.build(this.user);

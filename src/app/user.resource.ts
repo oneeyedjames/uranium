@@ -4,8 +4,11 @@ import { Application } from '../lib/application';
 import { Resource, Entity, Controller, Model, View, ViewContext } from '../lib/resource';
 import { UserIdentity } from '../lib/authenticator';
 
+import { RoleEntity } from './role.resource';
+
 export interface UserEntity extends Entity, UserIdentity {
 	super: boolean;
+	roles: RoleEntity[];
 }
 
 export class UserResource extends Resource<UserEntity> {
@@ -25,7 +28,7 @@ export class UserResource extends Resource<UserEntity> {
 		let model = this.createModel();
 		let view = this.createView(model);
 
-		return new UserController(model, view, req.user as UserEntity);
+		return new UserController(model, view, req.user);
 	}
 
 	protected createModel() {
@@ -55,16 +58,8 @@ export class UserView extends View<UserEntity> {
 }
 
 export class UserController extends Controller<UserEntity> {
-	constructor(
-		model: Model<UserEntity>,
-		view: View<UserEntity>,
-		protected user: UserEntity
-	) {
-		super(model, view);
-	}
-
 	async getMe(): Promise<object> {
-		return this.view.build(this.user);
+		return this.view.build(this.user as UserEntity);
 	}
 }
 

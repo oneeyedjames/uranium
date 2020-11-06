@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser';
 
 import { Database } from './database';
 import { Authenticator, AuthFunction } from './authenticator';
-export { Authenticator, AuthFunction } from './authenticator';
+export { Authenticator, AuthFunction, UserIdentity } from './authenticator';
 
 export { Module } from './module';
 
